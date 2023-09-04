@@ -8,22 +8,18 @@ def read_matrix_from_file(file_name):
         # Read the file and split lines
         with open(file_name, 'r') as file:
             lines = file.readlines()
-
         # Initialize an empty list to store matrix entries
         matrix_entries = []
-
         # Iterate through the lines, split on commas, and convert to floats
         for line in lines:
             entries = [float(x.strip()) for x in line.strip().split(',')]
             matrix_entries.extend(list(entries))
-
         # Calculate the number of rows and columns
         num_rows = len(lines)
         if num_rows > 0:
             num_columns = len(matrix_entries) // num_rows
         else:
             num_columns = 0
-
         # Return a tuple containing matrix entries, number of rows, and number of columns
         return matrix_entries, num_rows, num_columns
 
@@ -39,25 +35,13 @@ def print_matrix_with_precision(matrix_list, num_columns):
         row_str = ','.join(formatted_row)
         print(row_str)
 
+
 def calculate_average(numbers):
     if len(numbers) == 0:
         return 0  # Handle the case where the list is empty to avoid division by zero.
-    
     total = sum(numbers)
     average = total / len(numbers)
     return average
-
-def round_to_4_decimals(arr):
-    # Check if the input is a NumPy array
-    if not isinstance(arr, np.ndarray) or arr.ndim != 1:
-        raise ValueError("Input must be a one-dimensional NumPy array of floats")
-    # Use list comprehension to round each element to 4 decimal places
-    rounded_list = [round(x, 4) for x in arr]
-    return rounded_list
-
-def round_floats_to_4_decimal_places(input_list):
-    rounded_list = [round(num, 4) for num in input_list]
-    return rounded_list
 
 
 def main():
@@ -100,8 +84,8 @@ def main():
 
         h = np.random.uniform(0, (np.sqrt(normal_mat_avg/k) * 2), (k*vec_num))
 
-        resultsB = sm.symnmf(h, vec_num, k, norm_mat, vec_num, vec_num, beta, max_iter, eps)
-        print_matrix_with_precision("kkk", resultsB[0], resultsB[1])
+        resultsB = sm.symnmf(list(h), vec_num, k, norm_mat, vec_num, vec_num, beta, max_iter, eps)
+        print_matrix_with_precision(resultsB[0], resultsB[1])
     
     else:
         print("An Error Has Occurred")

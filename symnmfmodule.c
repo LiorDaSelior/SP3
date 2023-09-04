@@ -231,16 +231,6 @@ static PyObject *symnmf(PyObject *self, PyObject *args) // function called from 
 
     symnmf_mat_c = create_ass_matrix(h_mat, norm_mat, beta, iter, eps);
     mat_size = (symnmf_mat_c->col) * (symnmf_mat_c->row);
-    printf("\ncol %d, row, %d", symnmf_mat_c->col, symnmf_mat_c->row);
-    printf("\nmat size %d\n", mat_size);
-
-    printf("\nbegin1\n");
-    print_matrix(h_mat);
-    printf("end1\n");
-
-    printf("\nbegin\n");
-    print_matrix(symnmf_mat_c);
-    printf("end\n");
 
     PyObject *symnmf_mat_py = PyList_New(0);
     for (i = 0; i < mat_size; i++)
