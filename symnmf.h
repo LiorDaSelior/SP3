@@ -5,6 +5,7 @@ typedef struct
     double *data;
 } Matrix;
 
+int print_matrix(Matrix *matrix);
 Matrix *create_sym_matrix(Matrix *);
 Matrix *create_ddg_matrix(Matrix *);
 Matrix *create_norm_matrix(Matrix *, Matrix *);

@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import symnmfmodule as sm
 
-
 def read_matrix_from_file(file_name):
     try:
         # Read the file and split lines
@@ -62,6 +61,7 @@ def round_floats_to_4_decimal_places(input_list):
 
 
 def main():
+    np.random.seed(0)
     eps = 0.0001
     beta = 0.5
     max_iter = 300
@@ -93,18 +93,14 @@ def main():
         print_matrix_with_precision(results[0], results[1])
 
     elif (goal == "symnmf"):
-        np.random.seed(0)
         results = sm.norm(matrix, vec_num, vec_size)
         norm_mat = results[0]
-        norm_mat_round = round_floats_to_4_decimal_places(norm_mat)
 
-        normal_mat_avg = calculate_average(norm_mat_round)
+        normal_mat_avg = calculate_average(norm_mat)
 
-        h = np.random.uniform(0, ((np.sqrt(normal_mat_avg/k) * 2)+1), (k*vec_num))
-        
-        h_round = round_to_4_decimals(h)
-        resultsB = 0, 0
-        resultsB = sm.symnmf(h_round, vec_num, k, norm_mat_round, vec_num, vec_size, beta, max_iter, eps)
+        h = np.random.uniform(0, (np.sqrt(normal_mat_avg/k) * 2), (k*vec_num))
+
+        resultsB = sm.symnmf(h, vec_num, k, norm_mat, vec_num, vec_num, beta, max_iter, eps)
         print_matrix_with_precision("kkk", resultsB[0], resultsB[1])
     
     else:

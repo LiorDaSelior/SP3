@@ -23,7 +23,6 @@ struct vector
 int string_to_vector(struct vector *, int, double *);
 int free_matrix(Matrix *);
 int set_matrix_data(Matrix *matrix, int row, int col);
-int print_matrix(Matrix *matrix);
 double calc_sq_dist(Matrix *, int, int);
 Matrix *matrix_mult(Matrix *, Matrix *);
 Matrix *matrix_trans(Matrix *);

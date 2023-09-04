@@ -234,6 +234,10 @@ static PyObject *symnmf(PyObject *self, PyObject *args) // function called from 
     printf("\ncol %d, row, %d", symnmf_mat_c->col, symnmf_mat_c->row);
     printf("\nmat size %d\n", mat_size);
 
+    printf("\nbegin1\n");
+    print_matrix(h_mat);
+    printf("end1\n");
+
     printf("\nbegin\n");
     print_matrix(symnmf_mat_c);
     printf("end\n");
@@ -249,9 +253,9 @@ static PyObject *symnmf(PyObject *self, PyObject *args) // function called from 
     PyTuple_SetItem(val, 0, symnmf_mat_py);
     PyTuple_SetItem(val, 1, PyLong_FromLong(symnmf_mat_c->col));
 
-    // free(h_mat->data);
     free(norm_mat->data);
-    // free(h_mat);
+    free(symnmf_mat_c->data);
+    free(symnmf_mat_c);
     free(norm_mat);
 
     return val;
