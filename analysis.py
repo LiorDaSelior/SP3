@@ -13,10 +13,10 @@ def euclidean_distance(vector1, vector2):
     
     return np.sqrt(distance)
 
-def find_vec_index(matrix, target_vector):
-    k = len(target_vector)
-    for index in range(0, len(matrix), k):
-        if matrix[index:index+k] == target_vector:
+def find_vec_index(data_mat, vec):
+    k = len(vec)
+    for index in range(0, len(data_mat), k):
+        if data_mat[index:index+k] == vec:
             return index // k
     return -1
 
@@ -61,10 +61,10 @@ def compute_b(vec, data_mat ,clusters_mat, cols, k):
     return min(clus_dist)
     
     
-def clusters_mat(matrix, num_columns):
+def clusters_mat(data_mat, cols):
     result = []
-    for i in range(0, len(matrix), num_columns):
-        vector = matrix[i:i+num_columns]
+    for i in range(0, len(data_mat), cols):
+        vector = data_mat[i:i+cols]
         max_index = vector.index(max(vector))
         result.append(max_index)
     return result
@@ -84,6 +84,7 @@ def silhouette_score(data_mat, clusters_mat, k, cols):
     return sum1/(len(data_mat)//cols)
 
 def main():
+    np.random.seed(0)
     if (len(sys.argv) != 3):
         print("An Error Has Occurred")
         return 1
@@ -91,9 +92,9 @@ def main():
         k = int(sys.argv[1])
         filename = sys.argv[2]
 
-    matrix, vec_num, vec_size = smpy.read_matrix_from_file(filename)
+    data_mat, vec_num, vec_size = smpy.read_matrix_from_file(filename)
 
-    results = sm.norm(matrix, vec_num, vec_size)
+    results = sm.norm(data_mat, vec_num, vec_size)
     norm_mat = results[0]
     normal_mat_avg = smpy.calculate_average(norm_mat)
 
@@ -102,7 +103,10 @@ def main():
     
     clusters_matrix = clusters_mat(final_h[0], final_h[1])
 
-    sil_score = silhouette_score(matrix, clusters_matrix, k, vec_size)
+    smpy.print_matrix_with_precision(final_h[0], final_h[1])
+    print("\n",clusters_matrix,"\n")
+
+    sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
     print("nmf: ", round(sil_score, 4))
     return 0
 
