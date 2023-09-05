@@ -24,28 +24,32 @@ def compute_a(vec, data_mat ,clusters_mat, cols):
     index = find_vec_index(data_mat, vec)
     vec_cluster = clusters_mat[index]
     sum1 = 0
-    a = 0
+    i = 0
     clus_size = 0
-    for x in clusters_mat:
-        x_index = find_vec_index(data_mat ,data_mat[clusters_mat.index(x):clusters_mat.index(x)+cols])
-        x_cluster = clusters_mat[x_index]
-        if (x_index != index and x_cluster == vec_cluster):
+    while(i<len(data_mat)):
+        i_index = find_vec_index(data_mat, data_mat[i:i+cols])
+        if (i_index != index and clusters_mat[i_index] == vec_cluster):
             clus_size += 1
-            sum1 += euclidean_distance(data_mat[clusters_mat.index(x)*cols:clusters_mat.index(x)+cols], vec)
+            sum1 += euclidean_distance(data_mat[i:i+cols], vec)
+        i += cols
     if clus_size != 0:
-        a = sum1/clus_size
+        return sum1/clus_size
     else:
-        a = 0
-    return a
+        return 0
 
-def mean_vec_clus_dist(vec, clusters_mat, clus_index, data_mat):
+def mean_vec_clus_dist(vec, data_mat, clusters_mat, clus_index, cols):
     sum1 = 0 
     clus_size = 0
-    for x in clusters_mat:
-        if clus_index == x:
-            sum1 += euclidean_distance(data_mat[clusters_mat.index(x)*len(vec):clusters_mat.index(x)+len(vec)], vec)
+    i = 0
+    while(i<len(data_mat)):
+        if clusters_mat[find_vec_index(data_mat ,data_mat[i:i+cols])] == clus_index:
+            sum1 += euclidean_distance(data_mat[i:i+cols], vec)
             clus_size += 1
-    return sum1/clus_size
+        i += cols
+    if clus_size != 0:
+        return sum1/clus_size
+    else:
+        return 0
 
 def compute_b(vec, data_mat ,clusters_mat, cols, k):
     clus_dist = []
@@ -53,7 +57,7 @@ def compute_b(vec, data_mat ,clusters_mat, cols, k):
     vec_cluster = clusters_mat[index]
     for clus in range(k):
         if vec_cluster != clus:
-            clus_dist.append(mean_vec_clus_dist(vec, clusters_mat, clus, data_mat)) 
+            clus_dist.append(mean_vec_clus_dist(vec, data_mat, clusters_mat, clus, cols)) 
     return min(clus_dist)
     
     
@@ -63,7 +67,7 @@ def clusters_mat(matrix, num_columns):
         vector = matrix[i:i+num_columns]
         max_index = vector.index(max(vector))
         result.append(max_index)
-    return result  
+    return result
 
 def silhouette_coefficient(vec, data_mat, clusters_mat, k, cols):
     a = compute_a(vec, data_mat, clusters_mat, cols)
@@ -94,13 +98,12 @@ def main():
     normal_mat_avg = smpy.calculate_average(norm_mat)
 
     start_h = np.random.uniform(0, (np.sqrt(normal_mat_avg/k) * 2), (k*vec_num))
-
     final_h = sm.symnmf(list(start_h), vec_num, k, norm_mat, vec_num, vec_num, 0.5, 300, 0.0001)
+    
     clusters_matrix = clusters_mat(final_h[0], final_h[1])
 
     sil_score = silhouette_score(matrix, clusters_matrix, k, vec_size)
-    
-    print(sil_score)
+    print("nmf: ", round(sil_score, 4))
     return 0
 
 if __name__ == "__main__":
