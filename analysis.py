@@ -1,8 +1,8 @@
 import sys
 import pandas as pd
 import numpy as np
-import symnmfmodule as sm
 import symnmf as smpy
+import kmeans as km
 
 def euclidean_distance(vector1, vector2):
     if len(vector1) != len(vector2):
@@ -94,20 +94,28 @@ def main():
 
     data_mat, vec_num, vec_size = smpy.read_matrix_from_file(filename)
 
-    results = sm.norm(data_mat, vec_num, vec_size)
+    results = smpy.sm.norm(data_mat, vec_num, vec_size)
     norm_mat = results[0]
     normal_mat_avg = smpy.calculate_average(norm_mat)
 
     start_h = np.random.uniform(0, (np.sqrt(normal_mat_avg/k) * 2), (k*vec_num))
-    final_h = sm.symnmf(list(start_h), vec_num, k, norm_mat, vec_num, vec_num, 0.5, 300, 0.0001)
+    final_h = smpy.sm.symnmf(list(start_h), vec_num, k, norm_mat, vec_num, vec_num, 0.5, 300, 0.0001)
     
     clusters_matrix = clusters_mat(final_h[0], final_h[1])
 
     smpy.print_matrix_with_precision(final_h[0], final_h[1])
     print("\n",clusters_matrix,"\n")
 
-    sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
-    print("nmf: ", round(sil_score, 4))
+    nmf_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
+    print("nmf: ", round(nmf_sil_score, 4))
+    
+    vector_list = km.file_to_vector_list(filename)
+    data_mat = km.vector_list_to_vector_data(vector_list)
+    centroid_list = km.Centroid.create_k_len_centroid_list(vector_list, k)
+    clusters_matrix = km.algo(vector_list, centroid_list, 300)
+    
+    kmenas_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
+    print("kmeans: ", round(kmenas_sil_score, 4))
     return 0
 
 if __name__ == "__main__":
