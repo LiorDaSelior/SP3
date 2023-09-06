@@ -13,25 +13,18 @@ def euclidean_distance(vector1, vector2):
     
     return np.sqrt(distance)
 
-def find_vec_index(data_mat, vec):
-    k = len(vec)
-    for index in range(0, len(data_mat), k):
-        if data_mat[index:index+k] == vec:
-            return index // k
-    return -1
-
-def compute_a(vec, data_mat ,clusters_mat, cols):
-    index = find_vec_index(data_mat, vec)
+def compute_a(index, vec, data_mat ,clusters_mat, cols):
     vec_cluster = clusters_mat[index]
     sum1 = 0
     i = 0
+    j = 0
     clus_size = 0
     while(i<len(data_mat)):
-        i_index = find_vec_index(data_mat, data_mat[i:i+cols])
-        if (i_index != index and clusters_mat[i_index] == vec_cluster):
+        if (index != j and clusters_mat[j] == vec_cluster):
             clus_size += 1
             sum1 += euclidean_distance(data_mat[i:i+cols], vec)
         i += cols
+        j += 1
     if clus_size != 0:
         return sum1/clus_size
     else:
@@ -41,19 +34,20 @@ def mean_vec_clus_dist(vec, data_mat, clusters_mat, clus_index, cols):
     sum1 = 0 
     clus_size = 0
     i = 0
+    j = 0
     while(i<len(data_mat)):
-        if clusters_mat[find_vec_index(data_mat ,data_mat[i:i+cols])] == clus_index:
+        if clusters_mat[j] == clus_index:
             sum1 += euclidean_distance(data_mat[i:i+cols], vec)
             clus_size += 1
         i += cols
+        j += 1
     if clus_size != 0:
         return sum1/clus_size
     else:
         return 0
 
-def compute_b(vec, data_mat ,clusters_mat, cols, k):
+def compute_b(index, vec, data_mat ,clusters_mat, cols, k):
     clus_dist = []
-    index = find_vec_index(data_mat, vec)
     vec_cluster = clusters_mat[index]
     for clus in range(k):
         if vec_cluster != clus:
@@ -61,26 +55,28 @@ def compute_b(vec, data_mat ,clusters_mat, cols, k):
     return min(clus_dist)
     
     
-def clusters_mat(data_mat, cols):
+def clusters_mat(h_mat, cols):
     result = []
-    for i in range(0, len(data_mat), cols):
-        vector = data_mat[i:i+cols]
+    for i in range(0, len(h_mat), cols):
+        vector = h_mat[i:i+cols]
         max_index = vector.index(max(vector))
         result.append(max_index)
     return result
 
-def silhouette_coefficient(vec, data_mat, clusters_mat, k, cols):
-    a = compute_a(vec, data_mat, clusters_mat, cols)
-    b = compute_b(vec, data_mat ,clusters_mat, cols, k)
+def silhouette_coefficient(i, vec, data_mat, clusters_mat, k, cols):
+    a = compute_a(i, vec, data_mat, clusters_mat, cols)
+    b = compute_b(i, vec, data_mat ,clusters_mat, cols, k)
     coe = (b - a) / max(b,a)
     return coe
 
 def silhouette_score(data_mat, clusters_mat, k, cols):
     i = 0
+    j = 0
     sum1 = 0
     while(i<len(data_mat)):
-        sum1 += silhouette_coefficient(data_mat[i:i+cols], data_mat, clusters_mat, k, cols)
+        sum1 += silhouette_coefficient(j, data_mat[i:i+cols], data_mat, clusters_mat, k, cols)
         i += cols
+        j += 1
     return sum1/(len(data_mat)//cols)
 
 def main():
