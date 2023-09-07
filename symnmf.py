@@ -24,8 +24,7 @@ def read_matrix_from_file(file_name):
         return matrix_entries, num_rows, num_columns
 
     except Exception as e:
-        print("An Error Has Occurred")
-        return 1
+        return None
 
 
 def print_matrix_with_precision(matrix_list, num_columns):
@@ -57,6 +56,11 @@ def main():
         k = int(sys.argv[1])
         goal = sys.argv[2]
         filename = sys.argv[3]
+    
+    temp = read_matrix_from_file(filename)
+    if temp is None:
+        print("An Error Has Occurred")
+        return 1
     
     matrix, vec_num, vec_size = read_matrix_from_file(filename)
     
