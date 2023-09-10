@@ -72,9 +72,10 @@ int set_matrix_data(Matrix *matrix, int row, int col)
 
 int print_matrix(Matrix *matrix)
 {
-    for (int i = 0; i < matrix->row; i++)
+    int i=0, j=0;
+    for (i = 0; i < matrix->row; i++)
     {
-        for (int j = 0; j < matrix->col; j++)
+        for (j = 0; j < matrix->col; j++)
         {
             if (j == matrix->col - 1)
             {
@@ -85,24 +86,25 @@ int print_matrix(Matrix *matrix)
                 printf("%.4f,", GET(matrix, i, j));
             }
         }
-        printf("\n");
+        printf("\n"); /*check if newline needed*/
     }
-    return 0; // check if newline after matrix is needed
+    return 0;
 }
 
 Matrix *matrix_mult(Matrix *mat1, Matrix *mat2)
 {
-    assert(mat1->col == mat2->row);
+    int i=0, j=0, k=0;
     double calc;
     Matrix *temp = (Matrix *)malloc(sizeof(Matrix));
+    assert(mat1->col == mat2->row);
     assert(temp != NULL);
     set_matrix_data(temp, mat1->row, mat2->col);
-    for (int i = 0; i < temp->row; i++)
+    for (i = 0; i < temp->row; i++)
     {
-        for (int j = 0; j < temp->col; j++)
+        for (j = 0; j < temp->col; j++)
         {
             calc = 0;
-            for (int k = 0; k < mat1->col; k++)
+            for (k = 0; k < mat1->col; k++)
             {
                 calc = calc + (GET(mat1, i, k) * GET(mat2, k, j));
             }
@@ -114,12 +116,13 @@ Matrix *matrix_mult(Matrix *mat1, Matrix *mat2)
 
 Matrix *matrix_trans(Matrix *mat)
 {
+    int i=0, j=0;
     Matrix *temp = (Matrix *)malloc(sizeof(Matrix));
     assert(temp != NULL);
     set_matrix_data(temp, mat->col, mat->row);
-    for (int i = 0; i < temp->row; i++)
+    for (i = 0; i < temp->row; i++)
     {
-        for (int j = 0; j < temp->col; j++)
+        for (j = 0; j < temp->col; j++)
         {
             SET(temp, i, j, GET(mat, j, i));
         }
@@ -129,13 +132,14 @@ Matrix *matrix_trans(Matrix *mat)
 
 Matrix *create_sym_matrix(Matrix *vec_matrix)
 {
+    int i=0, j=0;
     double calc;
     Matrix *temp = (Matrix *)malloc(sizeof(Matrix));
     assert(temp != NULL);
     set_matrix_data(temp, vec_matrix->row, vec_matrix->row);
-    for (int i = 0; i < temp->row; i++)
+    for (i = 0; i < temp->row; i++)
     {
-        for (int j = 0; j < temp->col; j++)
+        for (j = 0; j < temp->col; j++)
         {
             calc = (i == j) ? 0 : exp(-1.0 * 0.5 * calc_sq_dist(vec_matrix, i, j));
             SET(temp, i, j, calc);
@@ -146,14 +150,15 @@ Matrix *create_sym_matrix(Matrix *vec_matrix)
 
 Matrix *create_ddg_matrix(Matrix *sym_matrix)
 {
+    int i=0, j=0;
     double calc;
     Matrix *temp = (Matrix *)malloc(sizeof(Matrix));
     assert(temp != NULL);
     set_matrix_data(temp, sym_matrix->row, sym_matrix->col);
-    for (int i = 0; i < temp->row; i++)
+    for (i = 0; i < temp->row; i++)
     {
         calc = 0;
-        for (int j = 0; j < temp->col; j++)
+        for (j = 0; j < temp->col; j++)
         {
             calc = calc + GET(sym_matrix, i, j);
         }
@@ -164,29 +169,32 @@ Matrix *create_ddg_matrix(Matrix *sym_matrix)
 
 Matrix *create_norm_matrix(Matrix *sym_matrix, Matrix *ddg_matrix)
 {
+    Matrix *m1, *temp;
+    int i=0, j=0;
     double calc;
-    for (int i = 0; i < ddg_matrix->row; i++)
+    for (i = 0; i < ddg_matrix->row; i++)
     {
-        for (int j = 0; j < ddg_matrix->col; j++)
+        for (j = 0; j < ddg_matrix->col; j++)
         {
             calc = (GET(ddg_matrix, i, j) == 0) ? 0 : pow((GET(ddg_matrix, i, j)), -0.5f);
             SET(ddg_matrix, i, j, calc);
         }
     }
-    Matrix *m1 = matrix_mult(ddg_matrix, sym_matrix);
-    Matrix *temp = matrix_mult(m1, ddg_matrix);
+    m1 = matrix_mult(ddg_matrix, sym_matrix);
+    temp = matrix_mult(m1, ddg_matrix);
     free_matrix(m1);
     return temp;
 }
 
 double calc_sq_dist(Matrix *vec_matrix, int vec1_index, int vec2_index)
 {
+    int i = 0;
+    double total = 0;
     if (vec1_index == vec2_index)
     {
         return 0;
     }
-    double total = 0;
-    for (int i = 0; i < vec_matrix->col; i++)
+    for (i = 0; i < vec_matrix->col; i++)
     {
         total = total + pow(GET(vec_matrix, vec1_index, i) - GET(vec_matrix, vec2_index, i), 2);
     }
@@ -195,15 +203,16 @@ double calc_sq_dist(Matrix *vec_matrix, int vec1_index, int vec2_index)
 
 Matrix *create_updated_h_matrix(Matrix *h_matrix, Matrix *norm_matrix, double beta)
 {
+    int i=0, j=0;
     Matrix *temp = matrix_mult(norm_matrix, h_matrix);
     Matrix *h_matrix_trans = matrix_trans(h_matrix);
     Matrix *m1 = matrix_mult(norm_matrix, h_matrix);
     Matrix *m2_temp = matrix_mult(h_matrix, h_matrix_trans);
     Matrix *m2 = matrix_mult(m2_temp, h_matrix);
     double calc;
-    for (int i = 0; i < temp->row; i++)
+    for (i = 0; i < temp->row; i++)
     {
-        for (int j = 0; j < temp->col; j++)
+        for (j = 0; j < temp->col; j++)
         {
             calc = GET(h_matrix, i, j) * (1 - beta + beta * (GET(m1, i, j) / GET(m2, i, j)));
             SET(temp, i, j, calc);
@@ -217,24 +226,25 @@ Matrix *create_updated_h_matrix(Matrix *h_matrix, Matrix *norm_matrix, double be
 }
 
 double calc_frobenius(Matrix *mat1, Matrix *mat2)
-{ // mat1 is (i+1) - assume same dimensions
+{
+    int i=0, j=0;
     double total = 0;
-    for (int i = 0; i < mat1->row; i++)
+    for (i = 0; i < mat1->row; i++)
     {
-        for (int j = 0; j < mat1->col; j++)
+        for (j = 0; j < mat1->col; j++)
         {
             total = total + pow((GET(mat1, i, j) - GET(mat2, i, j)), 2);
         }
     }
-    return total; // maybe need square root?
+    return total;
 }
 
 Matrix *create_ass_matrix(Matrix *h_matrix, Matrix *norm_matrix, double beta, int iter, double eps)
-{ // frees original H
+{
     int i = 0;
     int check = 0;
     Matrix *prev_mat = h_matrix;
-    Matrix *next_mat;
+    Matrix *next_mat = h_matrix;
     while ((i < iter) && check == 0)
     {
         next_mat = create_updated_h_matrix(prev_mat, norm_matrix, beta);
@@ -245,7 +255,6 @@ Matrix *create_ass_matrix(Matrix *h_matrix, Matrix *norm_matrix, double beta, in
         free_matrix(prev_mat);
         prev_mat = next_mat;
         i++;
-        // printf("%d\n", i);
     }
     return next_mat;
 }
@@ -254,12 +263,13 @@ int main(int argc, char const *argv[])
 {
     struct vector *head_vec, *curr_vec, *prev_vec;
     struct cord *head_cord, *curr_cord;
-    int vec_size = 1, vec_num = 0, i = 0, arr_size, k;
+    int vec_size = 1, vec_num = 0, i = 0, arr_size;
     double n;
     double *coor_arr;
     char c;
     char const *mode, *filename;
     Matrix *vector_matrix, *sym_matrix, *ddg_matrix, *norm_matrix;
+    FILE *fp;
 
     if (argc != 3)
     {
@@ -270,8 +280,6 @@ int main(int argc, char const *argv[])
     mode = argv[1];
     filename = argv[2];
 
-    // printf("%s\n", mode);
-
     head_cord = malloc(sizeof(struct cord));
     curr_cord = head_cord;
     curr_cord->next = NULL;
@@ -279,8 +287,9 @@ int main(int argc, char const *argv[])
     head_vec = malloc(sizeof(struct vector));
     curr_vec = head_vec;
     curr_vec->next = NULL;
+    prev_vec = curr_vec;
 
-    FILE *fp = fopen(filename, "r");
+    fp = fopen(filename, "r");
     assert(fp != NULL);
 
     while (fscanf(fp, "%lf%c", &n, &c) == 2)
@@ -343,9 +352,6 @@ int main(int argc, char const *argv[])
     vector_matrix->row = vec_num;
     vector_matrix->col = vec_size;
     vector_matrix->data = coor_arr;
-
-    // print_matrix(vector_matrix);
-    // printf("\n");
 
     if (strcmp(mode, "sym") == 0)
     {

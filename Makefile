@@ -1,5 +1,5 @@
 symnmf: symnmf.o symnmf.h
-    gcc -ansi -Wall -Wextra -Werror -pedantic-errors -o symnmf symnmf.o
+	gcc -o symnmf symnmf.o -lm
 
 symnmf.o: symnmf.c
-    gcc -ansi -Wall -Wextra -Werror -pedantic-errors -c symnmf.c
+	gcc -c -ansi -Wall -Wextra -Werror -pedantic-errors symnmf.c
