@@ -99,11 +99,8 @@ def main():
     
     clusters_matrix = clusters_mat(final_h[0], final_h[1])
 
-    smpy.print_matrix_with_precision(final_h[0], final_h[1])
-    print("\n",clusters_matrix,"\n")
-
     nmf_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
-    print("nmf: ", round(nmf_sil_score, 4))
+    print("nmf:", round(nmf_sil_score, 4))
     
     vector_list = km.file_to_vector_list(filename)
     data_mat = km.vector_list_to_vector_data(vector_list)
@@ -111,7 +108,7 @@ def main():
     clusters_matrix = km.algo(vector_list, centroid_list, 300)
     
     kmenas_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
-    print("kmeans: ", round(kmenas_sil_score, 4))
+    print("kmeans:", round(kmenas_sil_score, 4))
     return 0
 
 if __name__ == "__main__":

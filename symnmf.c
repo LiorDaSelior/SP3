@@ -263,7 +263,7 @@ int main(int argc, char const *argv[])
 {
     struct vector *head_vec, *curr_vec, *prev_vec;
     struct cord *head_cord, *curr_cord;
-    int vec_size = 1, vec_num = 0, i = 0, arr_size;
+    int check = 0, vec_size = 1, vec_num = 0, i = 0, arr_size;
     double n;
     double *coor_arr;
     char c;
@@ -294,6 +294,9 @@ int main(int argc, char const *argv[])
 
     while (fscanf(fp, "%lf%c", &n, &c) == 2)
     {
+        if (check == 0) {
+            check++;
+        }
         if (c == '\n')
         {
             curr_cord->value = n;
@@ -332,10 +335,17 @@ int main(int argc, char const *argv[])
         curr_cord = curr_cord->next;
         curr_cord->next = NULL;
     }
-    free(curr_cord);
-    free(curr_vec);
-    curr_vec = prev_vec;
-    curr_vec->next = NULL;
+    fclose(fp);
+    
+    if (check == 1) {
+        free(curr_cord);
+        free(curr_vec);
+        curr_vec = prev_vec;
+        curr_vec->next = NULL;
+    }
+    else {
+        free(curr_cord);
+    }
 
     arr_size = vec_num * vec_size;
     coor_arr = (double *)malloc(arr_size * sizeof(double));
