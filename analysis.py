@@ -142,14 +142,20 @@ def main_sklearn():
     sublists = [data_mat[x:x+vec_size] for x in range(0, len(data_mat), vec_size)]
     matrix = np.array(sublists)
     
-    nmf_sil_score = silhouette_score(matrix, clusters_matrix)
-    print("sk nmf:", round(nmf_sil_score, 4))
+    try:
+        nmf_sil_score = silhouette_score(matrix, clusters_matrix)
+        print("sk nmf:", round(nmf_sil_score, 4))
+    except ValueError:
+        print("sk nmf value error - all in 1 cluster")
     
     centroid_list = km.Centroid.create_k_len_centroid_list(sublists, k)
     clusters_matrix = km.algo(sublists, centroid_list, 300)
     
-    kmenas_sil_score = silhouette_score(matrix, clusters_matrix)
-    print("sk kmeans:", round(kmenas_sil_score, 4))
+    try:
+        kmenas_sil_score = silhouette_score(matrix, clusters_matrix)
+        print("sk kmeans:", round(kmenas_sil_score, 4))
+    except ValueError:
+        print("sk kmeans value error - all in 1 cluster")
     
     return 0
 
