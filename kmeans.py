@@ -65,7 +65,7 @@ def assign(vector_list, centroid_list):
     return centroid_ass_list
 
 def igt_epsilon(vector1, vector2):
-    e = 0.001
+    e = 0.0001
     if calc_dist(vector1, vector2) >= e:
         return True
     return False

@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import symnmf as smpy
 import kmeans as km
+from sklearn.metrics import silhouette_score
 
 def euclidean_distance(vector1, vector2):
     if len(vector1) != len(vector2):
@@ -53,8 +54,7 @@ def compute_b(index, vec, data_mat ,clusters_mat, cols, k):
         if vec_cluster != clus:
             clus_dist.append(mean_vec_clus_dist(vec, data_mat, clusters_mat, clus, cols)) 
     return min(clus_dist)
-    
-    
+        
 def clusters_mat(h_mat, cols):
     result = []
     for i in range(0, len(h_mat), cols):
@@ -69,7 +69,7 @@ def silhouette_coefficient(i, vec, data_mat, clusters_mat, k, cols):
     coe = (b - a) / max(b,a)
     return coe
 
-def silhouette_score(data_mat, clusters_mat, k, cols):
+def silhouette_score_custom(data_mat, clusters_mat, k, cols):
     i = 0
     j = 0
     sum1 = 0
@@ -88,6 +88,10 @@ def main():
         k = int(sys.argv[1])
         filename = sys.argv[2]
 
+    temp = smpy.read_matrix_from_file(filename)
+    if temp is None:
+        print("An Error Has Occurred")
+        return 1
     data_mat, vec_num, vec_size = smpy.read_matrix_from_file(filename)
 
     results = smpy.sm.norm(data_mat, vec_num, vec_size)
@@ -99,7 +103,7 @@ def main():
     
     clusters_matrix = clusters_mat(final_h[0], final_h[1])
 
-    nmf_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
+    nmf_sil_score = silhouette_score_custom(data_mat, clusters_matrix, k, vec_size)
     print("nmf:", round(nmf_sil_score, 4))
     
     vector_list = km.file_to_vector_list(filename)
@@ -107,10 +111,49 @@ def main():
     centroid_list = km.Centroid.create_k_len_centroid_list(vector_list, k)
     clusters_matrix = km.algo(vector_list, centroid_list, 300)
     
-    kmenas_sil_score = silhouette_score(data_mat, clusters_matrix, k, vec_size)
+    kmenas_sil_score = silhouette_score_custom(data_mat, clusters_matrix, k, vec_size)
     print("kmeans:", round(kmenas_sil_score, 4))
+    return 0
+
+def main_sklearn():
+    np.random.seed(0)
+    if (len(sys.argv) != 3):
+        print("An Error Has Occurred")
+        return 1
+    else:
+        k = int(sys.argv[1])
+        filename = sys.argv[2]
+
+    temp = smpy.read_matrix_from_file(filename)
+    if temp is None:
+        print("An Error Has Occurred")
+        return 1
+    data_mat, vec_num, vec_size = smpy.read_matrix_from_file(filename)
+
+    results = smpy.sm.norm(data_mat, vec_num, vec_size)
+    norm_mat = results[0]
+    normal_mat_avg = smpy.calculate_average(norm_mat)
+
+    start_h = np.random.uniform(0, (np.sqrt(normal_mat_avg/k) * 2), (k*vec_num))
+    final_h = smpy.sm.symnmf(list(start_h), vec_num, k, norm_mat, vec_num, vec_num, 0.5, 300, 0.0001)
+    
+    clusters_matrix = clusters_mat(final_h[0], final_h[1])
+    
+    sublists = [data_mat[x:x+vec_size] for x in range(0, len(data_mat), vec_size)]
+    matrix = np.array(sublists)
+    
+    nmf_sil_score = silhouette_score(matrix, clusters_matrix)
+    print("sk nmf:", round(nmf_sil_score, 4))
+    
+    centroid_list = km.Centroid.create_k_len_centroid_list(sublists, k)
+    clusters_matrix = km.algo(sublists, centroid_list, 300)
+    
+    kmenas_sil_score = silhouette_score(matrix, clusters_matrix)
+    print("sk kmeans:", round(kmenas_sil_score, 4))
+    
     return 0
 
 if __name__ == "__main__":
     main()
+    main_sklearn()
     
