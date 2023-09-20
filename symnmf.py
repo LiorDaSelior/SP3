@@ -1,5 +1,4 @@
 import sys
-import pandas as pd
 import numpy as np
 import symnmfmodule as sm
 
@@ -25,7 +24,7 @@ def read_matrix_from_file(file_name):
 def print_matrix_with_precision(matrix_list, num_columns):
     for i in range(0, len(matrix_list), num_columns):
         row = matrix_list[i:i + num_columns]
-        formatted_row = [f'{x:.4f}' for x in row]
+        formatted_row = ["{:.4f}".format(x) for x in row]
         row_str = ','.join(formatted_row)
         print(row_str)
 

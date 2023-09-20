@@ -42,7 +42,7 @@ def main():
     
     try:
         nmf_sil_score = silhouette_score(matrix, clusters_matrix)
-        print("nmf:", round(nmf_sil_score, 4))
+        print("nmf: {:.4f}".format(nmf_sil_score))
     except ValueError as e:
         print("An Error Has Occurred")
         return 1
@@ -52,11 +52,10 @@ def main():
     
     try:
         kmenas_sil_score = silhouette_score(matrix, clusters_matrix)
-        print("kmeans:", round(kmenas_sil_score, 4))
+        print("kmeans: {:.4f}".format(kmenas_sil_score))
     except ValueError as e:
         print("An Error Has Occurred")
         return 1
-    
     return 0
 
 if __name__ == "__main__":
