@@ -86,7 +86,7 @@ int print_matrix(Matrix *matrix)
                 printf("%.4f,", GET(matrix, i, j));
             }
         }
-        printf("\n"); /*check if newline needed*/
+        printf("\n");
     }
     return 0;
 }
